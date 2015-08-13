@@ -104,7 +104,7 @@ var Lift = function() {
 				Tween.clear.call(this.cat.tween)
 				Tween.create.call(this.cat.tween, "translate", 1, false, function() {}, "linear", 0, 0, 0, Game.height - this.lift.startHeight-Game.width*this.lift.ratio, 1)
 				this.inPause = true
-				PC ? setTimeout("lift.continueGame()", 1000) : setTimeout("confirm('你的神经猫特工搜集到'+lift.sprite.collectedAmount+'条线索'+'，继续不') ? lift.continueGame() :''", 1000)
+				setTimeout("confirm('你的神经猫特工搜集到'+lift.sprite.collectedAmount+'条线索'+'，继续不') ? lift.continueGame() :''", 1000)
 				document.title = "【塘沽真相】我的神经猫特工搜集到" + this.sprite.collectedAmount + "条线索，击败" + Math.round(100 * this.sprite.collectedAmount / this.sprite.splitLength) + "%的人，牺牲在第" + this.lift.level + "搜索区"
 			}
 		}
@@ -121,7 +121,7 @@ var Lift = function() {
 					Tween.clear.call(this.cat.tween)
 					Tween.create.call(this.cat.tween, "translate", 1, false, function() {}, "linear", 0, 0, 0, -this.lift.startHeight, 1)
 					this.inPause = true
-					PC ? setTimeout("lift.continueGame()", 1000) : setTimeout("confirm('你的神经猫特工搜集到'+lift.sprite.collectedAmount+'条线索'+'，继续不') ? lift.continueGame() :''", 1000)
+					setTimeout("confirm('你的神经猫特工搜集到'+lift.sprite.collectedAmount+'条线索'+'，继续不') ? lift.continueGame() :''", 1000)
 					document.title = "【塘沽真相】我的神经猫特工搜集到" + this.sprite.collectedAmount + "条线索，击败" + Math.round(100 * this.sprite.collectedAmount / this.sprite.splitLength) + "%的人，牺牲在第" + this.lift.level + "搜索区"
 				} else {
 					this.sprite.collected.push(this.sprite.sprites[i][2])
