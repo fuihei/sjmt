@@ -3,6 +3,8 @@ var Lift = function() {
 	var clue = "二一五始皇东巡北海求仙一九九零八国联军攻占大沽津门沦陷一九七六唐山地震百万流离二零一五自贸区挂牌天津港扬帆长歌当哭为何偏偏午夜二十三点哀鸿遍野蘑菇云七十年再现连环爆炸区区只隔弹指间国家咽喉首都肝胆经济命脉亿万血汗东京北京谈话阅兵曾记否七七事变全国通电平津危则华北危华北危则中华民族危但试问真相背后谁在扬帆"
 	var pressColor = "red"
 	var self = this
+	this.restart=false
+	setTimeout("lift.restart=true",2000)
 	this.initial = function() {
 		this.lift = {
 			speed: 30,
@@ -276,7 +278,7 @@ var Lift = function() {
 					if (this.lift.level != 15) {
 						this.inPause = true
 						confirm("当前区域搜索完毕，是否进入第" + this.lift.level + "搜索区") ? this.cancelPause() : ""
-					} else {
+					} else if(!this.restart) {
 						this.inPause = true
 						confirm("你怀着沉痛的心情来到塘沽，是否进入第" + this.lift.level + "搜索区") ? this.cancelPause() : ""
 					}
