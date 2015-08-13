@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="user-scalable=no" />
-		<title>神经猫2号：逃回火星</title>
+		<title>神经猫：塘沽真相</title>
 		<script src="js/loader.js" type="text/javascript" charset="UTF-8"></script>
 		<script src="js/sdk.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/engine.js" type="text/javascript" charset="utf-8"></script>
@@ -13,10 +13,10 @@
 		<script>
 			var _hmt = _hmt || [];
 			(function() {
-			  var hm = document.createElement("script");
-			  hm.src = "//hm.baidu.com/hm.js?46bcbb3c84ebc3854acfc409244952f6";
-			  var s = document.getElementsByTagName("script")[0]; 
-			  s.parentNode.insertBefore(hm, s);
+				var hm = document.createElement("script");
+				hm.src = "//hm.baidu.com/hm.js?46bcbb3c84ebc3854acfc409244952f6";
+				var s = document.getElementsByTagName("script")[0];
+				s.parentNode.insertBefore(hm, s);
 			})();
 		</script>
 		<style type="text/css">
@@ -32,16 +32,19 @@
 	<body bgcolor="green">
 		<script type="text/javascript">
 			window.onload = function() {
-				Game.initial(callLoadStage);
-				if (PC) {
-					var next = document.createElement("p")
-					next.innerHTML = "\n"
-					document.body.appendChild(next)
+				onAD = false;
+				if (onAD) {
+					var ad = document.createElement("a")
+					ad.href = "https://itunes.apple.com/cn/app/dawn-mensas-lift/id993746668?l=cn&mt=8"
+					ad.innerHTML = window.innerWidth < 500 || PC ? '<img src="img/banner_s.png"/>' : '<img src="img/banner.png"/>'
+					document.body.appendChild(ad)
+					if (PC) {
+						var next = document.createElement("p")
+						next.innerHTML = "\n"
+						document.body.appendChild(next)
+					}
 				}
-				var ad = document.createElement("a")
-				ad.href = "https://itunes.apple.com/cn/app/dawn-mensas-lift/id993746668?l=cn&mt=8"
-				ad.innerHTML = window.innerWidth < 500 || PC ? '<img src="img/banner_s.png"/>' : '<img src="img/banner.png"/>'
-				document.body.appendChild(ad)
+				Game.initial(callLoadStage);
 			};
 		</script>
 	</body>

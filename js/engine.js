@@ -1,17 +1,18 @@
 var Lift = function() {
-	var mallLogos = ["安良百货", "外滩广场", "甬温你懂的", "威虎饭店", "神经病院"]
+	var mallLogos = ["化工仓库", "加油站", "轻轨线", "港口", "滨海机场"]
+	var clue = "二一五始皇东巡北海求仙一九九零八国联军攻占大沽津门沦陷一九七六唐山地震百万流离二零一五自贸区挂牌天津港扬帆长歌当哭为何偏偏午夜二十三点哀鸿遍野蘑菇云七十年再现连环爆炸区区只隔弹指间国家咽喉首都肝胆经济命脉亿万血汗东京北京谈话阅兵曾记否七七事变全国通电平津危则华北危华北危则中华民族危但试问真相背后谁在扬帆"
 	var pressColor = "red"
 	var self = this
 	this.initial = function() {
 		this.lift = {
-			speed: 20,
+			speed: 30,
 			distance: 0,
 			trip: 0,
 			lastTrip: -1,
-			level: 0,
+			level: 16,
 			levelNeedTrips: 5,
 			speedPlusByTrip: 2,
-			startHeight: 0.8 * Game.height,
+			startHeight: 0.95 * Game.height,
 			ratio: -0.25,
 			angle: Math.atan(-0.25),
 			baseColor: "grey",
@@ -21,8 +22,8 @@ var Lift = function() {
 			x: 0.2 * Game.width,
 			y: self.lift.startHeight + self.lift.ratio * 0.2 * Game.width,
 			tween: {},
-			level: 0,
-			levelByTimes: [10, 30, 60, 100, 150, 210, 280, 360, 450, 550, 660, 780, 910, 1050, 1200, 1360, 1530, 1710],
+			//level: 0,
+			//levelByTimes: [10, 30, 60, 100, 150, 210, 280, 360, 450, 550, 660, 780, 910, 1050, 1200, 1360, 1530, 1710],
 			baseColor: "black",
 			color: "black"
 		}
@@ -42,7 +43,7 @@ var Lift = function() {
 		this.catJump = {
 			upTime: 1,
 			crossTime: 1,
-			upTimes: 0,
+			//upTimes: 0,
 			freezeTimer: 0,
 			crossDirection: 0,
 			floatFrame: 0
@@ -53,22 +54,26 @@ var Lift = function() {
 		}
 		this.trap = {
 			traps: [
-				[-0.5 * Game.width, 5]
+				[-0.4 * Game.width, 5]
 			],
 			lengthByTrip: 5,
-			maxToTrips: 20,
+			maxToTrips: 15,
 			amountOfTrip: 2
 		}
 		this.sprite = {
-			sprites: [],
-			box: 20,
-			amount: 3,
-			effect: -1
+			splitWords: clue.split(''),
+			splitLength: 153,
+			sprites: [
+				[-0.6 * Game.width, this.lift.startHeight + this.lift.ratio * Game.width - 50, "前"]
+			], //x,y,value
+			collected: [], //value
+			collectedAmount: 0,
+			box: 20
 		}
 	}
 	this.initial()
 	this.guide = {
-		on: list.played <= 1 ? true : false,
+		on: list.played <= 2 ? true : false,
 		times: 0,
 		timer: 0
 	}
@@ -85,11 +90,11 @@ var Lift = function() {
 		if (this.guide.timer > 1000 && this.guide.times == 0) {
 			this.inPause = true
 			this.guide.times++
-				confirm("点击神经猫上下跳") ? this.cancelPause() : this.cancelPause()
+				confirm("点击神经猫上下跳\n从爆炸尘埃中收集线索") ? this.cancelPause() : this.cancelPause()
 		} else if (this.guide.timer > 3000 && this.guide.times == 1) {
 			this.inPause = true
 			this.guide.times++
-				confirm("点击两侧左右跳\n不要碰到陷阱") ? this.cancelPause() : this.cancelPause()
+				confirm("点击两侧左右跳\n不要碰到红色易爆炸物") ? this.cancelPause() : this.cancelPause()
 		}
 	}
 	this.checkTrapCollision = function() {
@@ -99,8 +104,8 @@ var Lift = function() {
 				Tween.clear.call(this.cat.tween)
 				Tween.create.call(this.cat.tween, "translate", 1, false, function() {}, "linear", 0, 0, 0, Game.height - this.lift.startHeight, 1)
 				this.inPause = true
-				PC ? setTimeout("lift.continueGame()", 1000) : setTimeout("confirm('你乘坐神经猫飞船逃回火星'+lift.catJump.upTimes+'次'+'，继续不') ? lift.continueGame() :''", 1000)
-				document.title = "我乘坐神经猫" + (this.cat.level + 2) + "号飞船逃回火星" + this.catJump.upTimes + "次，击败"+Math.round(this.catJump.upTimes/15)+"%的人，结果牺牲在"+this.lift.level + "F " + mallLogos[this.lift.trip % 5]
+				PC ? setTimeout("lift.continueGame()", 1000) : setTimeout("confirm('你的神经猫特工搜集到'+lift.sprite.collectedAmount+'条线索'+'，继续不') ? lift.continueGame() :''", 1000)
+				document.title = "【塘沽真相】我的神经猫特工搜集到" + this.sprite.collectedAmount + "条线索，击败" + Math.round(100 * this.sprite.collectedAmount / this.sprite.splitLength) + "%的人，牺牲在第" + this.lift.level + "搜索区"
 			}
 		}
 	}
@@ -112,25 +117,20 @@ var Lift = function() {
 			var catTop = this.cat.y - this.catHeight.now - jumpHeight
 			var catBottom = this.cat.y - jumpHeight
 			if ((this.cat.x >= spriteX - 0.5 * this.sprite.box) && (this.cat.x <= spriteX + 0.5 * this.sprite.box) && (catTop <= spriteY + 0.5 * this.sprite.box) && (catBottom >= spriteY - 0.5 * this.sprite.box)) {
-				if (this.sprite.sprites[i][2] == 0) {
-					this.sprite.effect = 0
-					this.catJump.upTime = 0.5
-					this.catJump.crossTime = 0.5
-					setTimeout("lift.catJump.upTime=1", 5000)
-					setTimeout("lift.catJump.crossTime=1", 5000)
-					setTimeout("lift.sprite.effect=-1", 5000)
-				} else if (this.sprite.sprites[i][2] == 1) {
-					this.sprite.effect = 1
-					this.catJump.upTime = 2
-					this.catJump.crossTime = 2
-					setTimeout("lift.catJump.upTime=1", 5000)
-					setTimeout("lift.catJump.crossTime=1", 5000)
-					setTimeout("lift.sprite.effect=-1", 5000)
-				} else if (this.sprite.sprites[i][2] == 2) {
-					this.sprite.effect = 2
-					this.catJump.floatFrame = 5
-					setTimeout("lift.catJump.floatFrame=0", 5000)
-					setTimeout("lift.sprite.effect=-1", 5000)
+				if (this.sprite.sprites[i][2] == -1) {
+					Tween.clear.call(this.cat.tween)
+					Tween.create.call(this.cat.tween, "translate", 1, false, function() {}, "linear", 0, 0, 0, -this.lift.startHeight, 1)
+					this.inPause = true
+					PC ? setTimeout("lift.continueGame()", 1000) : setTimeout("confirm('你的神经猫特工搜集到'+lift.sprite.collectedAmount+'条线索'+'，继续不') ? lift.continueGame() :''", 1000)
+					document.title = "【塘沽真相】我的神经猫特工搜集到" + this.sprite.collectedAmount + "条线索，击败" + Math.round(100 * this.sprite.collectedAmount / this.sprite.splitLength) + "%的人，牺牲在第" + this.lift.level + "搜索区"
+				} else {
+					this.sprite.collected.push(this.sprite.sprites[i][2])
+					this.sprite.collectedAmount++
+						if (this.sprite.collected.length == this.sprite.splitLength) {
+							this.inPause = true
+							setTimeout("confirm('你的神经猫特工搜集到'+lift.sprite.collectedAmount+'条线索'+'，继续不') ? lift.continueGame() :''", 1000)
+							document.title = "【塘沽真相】我的神经猫特工搜集到" + this.sprite.collectedAmount + "条线索，击败" + Math.round(100 * this.sprite.collectedAmount / this.sprite.splitLength) + "%的人，出色的完成了任务"
+						}
 				}
 				this.sprite.sprites.splice(i, 1)
 				i--
@@ -185,8 +185,8 @@ var Lift = function() {
 					if (this.catJump.freezeTimer == 0) {
 						Tween.clear.call(this.cat.tween)
 						this.startJumpUp(this.catJump.upTime, height)
-						this.catJump.upTimes++
-							this.plusLevel()
+							//this.catJump.upTimes++
+							//this.plusLevel()
 					}
 				} else {
 					Tween.clear.call(this.cat.tween)
@@ -223,21 +223,33 @@ var Lift = function() {
 		this.jcAcc = -this.jcSpeed / time //a=-v/t
 		this.startJumpUp(time, height)
 		this.cat.tween.nowFrame = this.catJump.floatFrame
-			//Tween.create.call(this.cat.tween, "rotate", 1, false, function() {}, this.cat.x, this.cat.y, this.cat.x, this.cat.y, 0,Math.PI/2+ this.lift.angle,time/2)
-			//Tween.create.call(this.cat.tween, "rotate", 1, true, function() {}, catEndingX, catEndingY, catEndingX, catEndingY, 0,Math.PI/2-this.lift.angle,time/2)
 	}
 	this.spriteGenerator = function() {
-		var part = rndc(this.sprite.amount)
-		for (var i = 0; i < 1; i++) {
-			this.sprite.sprites.push([rndf(Game.width / part) + i * Math.floor(Game.width / part) + Game.width * this.lift.trip, this.lift.startHeight + this.lift.ratio * Game.width - 60 - 5 * this.cat.level - 5 * rndc(this.cat.level), Math.min(Math.floor(this.cat.level / 5), rndf(3))])
+		var part = rndc(2)
+		for (var i = 0; i < part; i++) {
+			var isWord = Math.random() < 0.5 ? (this.sprite.splitWords.length > 0 ? true : false) : false
+			var wordParry = 5 * (16 - this.lift.level) + 5 * rndc(16 - this.lift.level)
+			var bombParry = 5 * (16 - this.lift.level) + 5 * rndc(16 - this.lift.level) + 20
+			this.sprite.sprites.push([rndf(Game.width / part) + i * Math.floor(Game.width / part) + Game.width * this.lift.trip, this.lift.startHeight + this.lift.ratio * Game.width - 50 - (isWord ? wordParry : bombParry), isWord ? this.sprite.splitWords[0] : -1])
+			if (isWord) {
+				this.sprite.splitWords.splice(0, 1)
+			}
 		}
 	}
 	this.spriteUnload = function() {
 		for (var i = 0; i < this.sprite.sprites.length; i++) {
 			var spriteX = Game.width + this.sprite.sprites[i][0] - this.lift.distance
 			if (spriteX < -this.sprite.box) {
+				if (this.sprite.sprites[i][2] != -1) {
+					this.sprite.collected.push("?")
+				}
 				this.sprite.sprites.splice(i, 1)
 				i--
+				if (this.sprite.collected.length == this.sprite.splitLength) {
+					this.inPause = true
+					setTimeout("confirm('你的神经猫特工搜集到'+lift.sprite.collectedAmount+'条线索'+'，继续不') ? lift.continueGame() :''", 1000)
+					document.title = "【塘沽真相】我的神经猫特工搜集到" + this.sprite.collectedAmount + "条线索，击败" + Math.round(100 * this.sprite.collectedAmount / this.sprite.splitLength) + "%的人，失踪在第" + this.lift.level + "区至今未归"
+				}
 			}
 		}
 	}
@@ -260,10 +272,13 @@ var Lift = function() {
 		if (this.lift.trip != this.lift.lastTrip) {
 			this.lift.lastTrip = this.lift.trip
 			if (this.lift.trip % this.lift.levelNeedTrips == 0) {
-				this.lift.level++
-					if (this.lift.trip > 0) {
+				this.lift.level--
+					if (this.lift.level != 15) {
 						this.inPause = true
-						confirm("恭喜你，是否进入第" + this.lift.level + "楼") ? this.cancelPause() : ""
+						confirm("当前区域搜索完毕，是否进入第" + this.lift.level + "搜索区") ? this.cancelPause() : ""
+					} else {
+						this.inPause = true
+						confirm("你怀着沉痛的心情来到塘沽，是否进入第" + this.lift.level + "搜索区") ? this.cancelPause() : ""
 					}
 			}
 			this.lift.speed += this.lift.speedPlusByTrip
@@ -291,14 +306,25 @@ var Lift = function() {
 	this.drawSprite = function(ctx) {
 		ctx.save()
 		ctx.textAlign = "center"
+		for (var j = 0, length = this.sprite.collected.length; j < length; j++) {
+			ctx.fillStyle = "grey"
+			ctx.fillRect(21 * (j % 15) + 12 - 0.5 * this.sprite.box, 50 + Math.floor(j / 15) * 21 - 0.5 * this.sprite.box, this.sprite.box, this.sprite.box)
+			ctx.fillStyle = "white"
+			ctx.fillText(this.sprite.collected[j][0], 21 * (j % 15) + 12, 50 + Math.floor(j / 15) * 21 + 0.4 * this.sprite.box)
+		}
 		for (var i = 0, length = this.sprite.sprites.length; i < length; i++) {
 			var spriteX = Game.width + this.sprite.sprites[i][0] - this.lift.distance
 			var spriteY = this.sprite.sprites[i][1] - (Game.width - spriteX) * this.lift.ratio
 			if (spriteX < Game.width) {
-				ctx.fillStyle = "grey"
-				ctx.fillRect(spriteX - 0.5 * this.sprite.box, spriteY - 0.5 * this.sprite.box, this.sprite.box, this.sprite.box)
-				ctx.fillStyle = "red"
-				ctx.fillText(this.sprite.sprites[i][2] == 0 ? "快" : (this.sprite.sprites[i][2] == 1 ? "缓" : "浮"), spriteX, spriteY + 0.4 * this.sprite.box)
+				if (this.sprite.sprites[i][2] == -1) {
+					ctx.fillStyle = "red"
+					ctx.fillRect(spriteX - 0.5 * this.sprite.box, spriteY - 0.5 * this.sprite.box, this.sprite.box, this.sprite.box)
+				} else {
+					ctx.fillStyle = "grey"
+					ctx.fillRect(spriteX - 0.5 * this.sprite.box, spriteY - 0.5 * this.sprite.box, this.sprite.box, this.sprite.box)
+					ctx.fillStyle = "white"
+					ctx.fillText("?", spriteX, spriteY + 0.4 * this.sprite.box)
+				}
 			}
 		}
 		ctx.restore()
@@ -327,27 +353,27 @@ var Lift = function() {
 		ctx.beginPath()
 		ctx.moveTo(this.cat.x, this.cat.y)
 		ctx.lineTo(this.cat.x, this.cat.y - this.catHeight.now)
-		ctx.fillText(this.sprite.effect == 2 ? "浮" : (this.sprite.effect == 1 ? "缓" : (this.sprite.effect == 0 ? "快" : "猫")), this.cat.x, this.cat.y - this.catHeight.now * (1 - this.catJump.freezeTimer))
+		ctx.fillText("猫", this.cat.x, this.cat.y - this.catHeight.now * (1 - this.catJump.freezeTimer))
 		ctx.stroke()
 		ctx.restore()
 	}
 	this.drawMallLogos = function(ctx) {
-		this.logo = this.lift.level + "F " + mallLogos[this.lift.trip % 5]
+		this.logo = this.lift.level + "区：" + mallLogos[this.lift.trip % 5]
 		this.fillX = Game.width - this.lift.distance % Game.width
 		ctx.save()
-		ctx.font = base_font["20"]
+		ctx.font = base_font["15"]
 		ctx.fillStyle = "grey"
 		ctx.textAlign = "right"
-		ctx.fillText(this.logo, this.fillX, this.lift.ratio * this.fillX + 0.5 * Game.height)
+		ctx.fillText(this.logo, this.fillX, this.lift.ratio * this.fillX + 1.05 * Game.height)
 		ctx.restore()
 	}
 	this.drawLift = function(ctx) {
 		ctx.save()
 		ctx.fillStyle = "red"
 		ctx.textAlign = "center"
-		ctx.font = base_font["22b"]
+		ctx.font = base_font["20b"]
 			//ctx.fillText("dist:" + Math.round(this.lift.distance) + ";trip:" + this.lift.trip + ";trap:" + this.trap.traps, 0, 20)
-		ctx.fillText("神经猫" + (this.cat.level + 2) + "号：逃回火星" + this.catJump.upTimes + "次", 0.5 * Game.width, 40)
+		ctx.fillText("神经猫特工：塘沽真相" + this.sprite.collectedAmount + "条线索", 0.5 * Game.width, 30)
 		ctx.lineWidth = 5
 		ctx.beginPath()
 		ctx.moveTo(0, this.lift.startHeight)
@@ -375,14 +401,11 @@ var Lift = function() {
 	this.draw = function(dt, ctx) {
 		this.drawLift(ctx)
 		this.drawMallLogos(ctx)
+		this.drawTrap(ctx)
+		this.drawSprite(ctx)
 		ctx.save()
-//		ctx.fillStyle="black"
-//		ctx.fillText(dt,100,100)
 		Tween.play.call(this.cat.tween)
 		this.drawCat(ctx)
 		ctx.restore()
-		this.drawTrap(ctx)
-		this.drawSprite(ctx)
-		this.drawLevel(ctx)
 	}
 }

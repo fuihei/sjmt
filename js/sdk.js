@@ -129,14 +129,6 @@ var Tween = {
 		//console.log(this.frameEvents.scale)
 		Tween.addFrameByType.call(this, 2);
 	},
-	rotate: function(sx, sy, ex, ey,sAngle, eAngle, duration) {
-		this.allFrame = Math.round(duration * 1000 / loopIntervalAvg);
-		for (var i = 0; i < this.allFrame; i++) {
-			this.frameEvents.rotate.push(sAngle + i * (eAngle - sAngle) / this.allFrame,sx+i*(ex-sx)/this.allFrame,sy+i*(ey-sy)/this.allFrame);
-		}
-		Tween.addFrameByType.call(this, 3);
-		console.log(this.frameEvents)
-	},
 	alpha: function(st, et, duration) {
 		this.allFrame = Math.round(duration * 1000 / loopIntervalAvg);
 		for (var i = 0; i < this.allFrame; i++) {
