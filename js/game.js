@@ -16,7 +16,7 @@ var Game = new function() {
 	}
 	this.initial = function(callNext) {
 		this.innerWidth = window.innerWidth;
-		this.innerHeight = window.innerHeight - (onAD?(window.innerWidth < 500 ? 35 : 65):0);
+		this.innerHeight = window.innerHeight - (onAD?(window.innerWidth < 500 ? 70 : 100):0);
 
 		if (!PC && this.innerHeight < this.innerWidth) {
 			alert(CN ? "本游戏竖屏体验最佳" : "this game displays in portrait best");
